@@ -2,6 +2,7 @@ const Manager = require("./lib/Manager");
 const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
 const inquirer = require("inquirer");
+const Employee = require("./lib/Employee");
 const path = require("path");
 const fs = require("fs");
 
@@ -10,6 +11,7 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
+var arrEmployee = [];
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
@@ -38,32 +40,84 @@ const render = require("./lib/htmlRenderer");
 inquirer
   .prompt([
     {
+      type: 'list',
+      name: 'role',
+      message: 'What is your role?',
+      choices: ["Engineer", "Manager", "Intern"]
+    },
+    {
       type: 'input',
       name: 'name',
       message: 'What is your name?',
     },
     {
-      type: 'checkbox',
-      message: 'What languages do you know?',
-      name: 'stack',
-      choices: ['HTML', 'CSS', 'JavaScript', 'MySQL'],
-    },
-    {
-      type: 'list',
-      message: 'What is your preferred method of communication?',
-      name: 'contact',
-      choices: ['email', 'phone'],
+      type: 'input',
+      name: 'id',
+      message: 'What is your Id?',
     },
     {
       type: 'input',
-      name: 'name',
-      message: 'What is your office number??',
+      message: 'What is your email address?',
+      name: 'email',
     },
   ])
   .then((data) => {
-    const filename = `${data.name.toLowerCase().split(' ').join('')}.json`;
+    if (data.role === "Engineer") {
+      inquirer
+        .prompt([
+          {
+            type: 'input',
+            message: 'What is your github account?',
+            name: 'github',
+          },
+        ])
+        .then((response) => {
+          let info = new Engineer(data.name, data.id, data.email, response.github);
+          console.log(info);
+          arrEmployee.push(info);
+        })
+      }
+      if (data.role === "Intern") {
+        inquirer
+          .prompt([
+            {
+              type: 'input',
+              message: 'What school did you go to?',
+              name: 'school',
+            },
+          ])
+          .then((response) => {
+            let internInfo = new Intern(data.name, data.id, data.email, response.school);
+            console.log(internInfo);
+            arrEmployee.push(internInfo);
+          })
+      }
+      if (data.role === "Manager") {
+        inquirer
+          .prompt([
+            {
+              type: 'input',
+              message: 'What is your office number?',
+              name: 'office',
+            },
+          ])
+          .then((response) => {
+            let managerInfo = new Manager(data.name, data.id, data.email, response.office);
+            console.log(managerInfo);
+            arrEmployee.push(managerInfo);
+          })
+      }
+  })
 
-    fs.writeFile(filename, JSON.stringify(data, null, '\t'), (err) =>
-      err ? console.log(err) : console.log('Success!')
-    );
-  });
+
+
+
+
+
+
+
+
+    // const filename = `${data.name.toLowerCase().split(' ').join('')}.json`;
+
+    // fs.writeFile(filename, JSON.stringify(data, null, '\t'), (err) =>
+    //   err ? console.log(err) : console.log('Success!')
